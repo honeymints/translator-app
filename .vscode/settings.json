@@ -1,3 +1,3 @@
 {
-    "dotnet.defaultSolution": "TranslatorApp.sln"
+    "dotnet.defaultSolution": "ContextProviderApp.sln"
 }
