@@ -1,5 +1,8 @@
-using ReversoAPI;
-using TranslatorApp.RequestModels;
+using System.Collections;
+using System.Net.Http.Headers;
+using ContextProviderApp.Models;
+using ContextProviderApp.Services;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +10,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<DictionaryService>();
+
+builder.Services.AddHttpClient("Dictionary", client =>
+{
+    client.BaseAddress = new Uri("https://api.dictionaryapi.dev/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
 
 var app = builder.Build();
 
@@ -20,17 +30,12 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 
-app.MapGet("/get-context", async (string text) =>
+app.MapGet("/get-context/{text}", async (DictionaryService dictionaryService,string text) =>
 {
-    var reverso = new ReversoClient();
+    var dictionary = dictionaryService.GetDictionaryAsync(text);
+    return Results.Ok(dictionary);
+});
 
-    var synonymData = await reverso.Synonyms.GetAsync(text, Language.English);
-    var descriptionData = await reverso.Context.GetAsync(text, Language.English, Language.Russian);
-    var synonyms = string.Join(', ', synonymData.Synonyms.Select(x => x?.Value).ToList());
-    return Results.Ok(synonyms ?? "No translation found");
-})
-.WithName("GetContext")
-.WithOpenApi();
 
 app.Run();
 
