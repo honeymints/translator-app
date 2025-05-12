@@ -32,7 +32,7 @@ app.UseHttpsRedirection();
 
 app.MapGet("/get-context/{text}", async (DictionaryService dictionaryService,string text) =>
 {
-    var dictionary = dictionaryService.GetDictionaryAsync(text);
+    var dictionary = await dictionaryService.GetDictionaryAsync(text);
     return Results.Ok(dictionary);
 });
 
