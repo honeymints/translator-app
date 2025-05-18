@@ -2,7 +2,6 @@ using System.Collections;
 using System.Net.Http.Headers;
 using ContextProviderApp.Models;
 using ContextProviderApp.Services;
-using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,15 +1,17 @@
-using Newtonsoft.Json;
-
 namespace ContextProviderApp.Models;
 
 public class Definitions
 {
-    [JsonProperty("definition")]
-    public string Definition { get; }
-    // [JsonProperty("example")]
-    // public string Example { get; }
-    [JsonProperty("synonyms")]
-    public List<string> Synonyms { get; }
-    [JsonProperty("antonyms")]
-    public List<string> Antonyms { get; }
+    public string Level { get; set; }
+    public string Definition { get; set; }
+    public List<string> Examples { get; set; }
+    public List<string> Synonyms { get; set; }
+
+    public List<Phrase> Phrases { get; set; }
+}
+
+public class Phrase
+{
+    public string Text { get; set; }
+    public string Example { get; set; }
 }
