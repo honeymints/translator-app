@@ -43,6 +43,23 @@ namespace ContextProviderApp.Services
                 var POS_HEADER_CHILD = "posgram dpos-g hdib lmr-5";
                 var POS_HEADER_CHILD_CHILD = "pos dpos";
 
+                var POS_BODY = "pos-body";
+                var POS_BODY_CHILD1 = "pr dsense";
+
+                var POS_BODY_CHILD1_CHILD1 = "dsense_h";
+                var POS_BODY_CHILD1_CHILD1_CHILD1 = "hw dsense_hw";
+                var POS_BODY_CHILD1_CHILD1_CHILD2 = "pos dsense_pos";
+                var POS_BODY_CHILD1_CHILD1_CHILD3 = "guideword dsense_gw";
+
+                var POS_BODY_CHILD2_CHILD1 = "sense-body dsense_b";
+                var POS_BODY_CHILD2_CHILD1_CHILD1 = "def-block ddef_block";
+                var POS_BODY_CHILD2_CHILD1_CHILD1_CHILD1 = "ddef_h";
+
+                var levelDiv = "div.ddef_h";
+                var levelSpan = "span.def-info.ddef-info > span.epp-xref.dxref";
+
+                var levels = doc.QuerySelectorAll($"{levelDiv} > {levelSpan}");
+
                 if (listOfSections != null && listOfSections.Any())
                 {
                     result.Contexts = new List<ContextData> { };
@@ -51,9 +68,37 @@ namespace ContextProviderApp.Services
                         var partOfSpeech = section?.Children?.FirstOrDefault(x => x.ClassName.Equals(POS_HEADER))?
                                                     .Children?.FirstOrDefault(x => x.ClassName.Equals(POS_HEADER_CHILD))?
                                                     .Children?.FirstOrDefault(x => x.ClassName.Equals(POS_HEADER_CHILD_CHILD))?.InnerHtml;
+
+                        var contexts = section?.Children?.FirstOrDefault(x => x.ClassName.Contains(POS_BODY))?.Children.Where(x => x.ClassName.Contains(POS_BODY_CHILD1));
+
+                        if (contexts != null && contexts.Any())
+                        {
+                            var contextBody = new Meaning();
+
+                            foreach (var item in contexts.Select((v, i) => new { index = i, value = v }))
+                            {
+                                var val = item.value;
+                                var index = item.index;
+                                var partOfSpeechContextBase = val.Children.FirstOrDefault(x => x.ClassName.Equals(POS_BODY_CHILD1_CHILD1));
+                                var partOfSpeechContext = string.Empty;
+                                foreach (var el in partOfSpeechContextBase.Children)
+                                {
+                                    partOfSpeechContext += " " + el.TextContent.Replace('\n', ' ').Trim();
+                                    partOfSpeechContext = partOfSpeechContext.TrimStart();
+
+                                }
+                                contextBody.Definitions = new List<Definitions>();
+                                var a = val.Children.FirstOrDefault(x => x.ClassName.Contains(POS_BODY_CHILD2_CHILD1)).Children.FirstOrDefault(x => x.ClassName.Contains(POS_BODY_CHILD2_CHILD1_CHILD1)).Children?.FirstOrDefault(x => x.ClassName.Contains("def ddef_d db"));
+
+
+                                contextBody.PartOfSpeechContext = partOfSpeechContext;
+                            }
+                        }
+
+
                         var contextData = new ContextData
                         {
-                            PartOfSpeech = partOfSpeech
+                            PartOfSpeech = partOfSpeech,
                         };
                         result.Contexts.Add(contextData);
                     }
@@ -79,6 +124,6 @@ namespace ContextProviderApp.Services
     public class ContextData
     {
         public string PartOfSpeech { get; set; }
-        public List<Meaning> Meanings { get; set; }
+        public List<Meaning> ContextBody { get; set; }
     }
 }
