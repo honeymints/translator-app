@@ -51,10 +51,15 @@ namespace ContextProviderApp.Services
                 var POS_BD_CHLD2_CHLD1_CHLD1 = "def-block ddef_block";
                 var POS_BD_CHLD2_CHLD1_CHLD1_CHLD1 = "ddef_h";
                 var POS_BD_CHLD2_CHLD1_CHLD1_CHLD1_CHLD1 = "def-info ddef-info";
+
                 var POS_BD_CHLD2_CHLD1_CHLD1_CHLD1_CHLD2 = "def ddef_d db";
 
                 var POS_BD_CHLD2_CHLD1_CHLD2 = "pr phrase-block dphrase-block";
                 var POS_BD_CHLD2_CHLD1_CHLD2_CHLD1 = "phrase-head dphrase_h";
+                var POS_BD_CHLD2_CHLD1_CHLD2_CHLD1_CHLD1 = "phrase-title dphrase-title";
+                var POS_BD_CHLD2_CHLD1_CHLD2_CHLD1_CHLD2 = "phrase-info dphrase-info";
+
+
                 var POS_BD_CHLD2_CHLD1_CHLD2_CHLD2 = "phrase-body dphrase_b";
 
                 var POS_BD_CHLD2_CHLD1_CHLD1_CHLD2 = "def-body ddef_b";
@@ -67,20 +72,17 @@ namespace ContextProviderApp.Services
                 var POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD2 = "xref synonyms hax dxref-w lmt-25";
                 var POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD2_CHLD1 = "lcs lmt-10 lmb-20";
 
-
-                var levelDiv = "div.ddef_h";
-                var levelSpan = "span.def-info.ddef-info > span.epp-xref.dxref";
-
-                var levels = doc.QuerySelectorAll($"{levelDiv} > {levelSpan}");
-
                 var meanings = new List<Meaning> { };
 
 
                 if (listOfSections != null && listOfSections.Any())
                 {
-                    result.Contexts = new List<ContextData> { };
                     foreach (var section in listOfSections)
                     {
+                        var contextData = new ContextData();
+
+                        var meaning = new Meaning();
+
                         var partOfSpeech = section?.Children?.FirstOrDefault(x => x.ClassName.Equals(POS_HEADER))?
                                                     .Children?.FirstOrDefault(x => x.ClassName.Equals(POS_HEADER_CHLD))?
                                                     .Children?.FirstOrDefault(x => x.ClassName.Equals(POS_HEADER_CHLD_CHLD))?.InnerHtml;
@@ -89,33 +91,35 @@ namespace ContextProviderApp.Services
 
                         if (contexts != null && contexts.Any())
                         {
-                            var meaning = new Meaning();
-                            foreach (var item in contexts.Select((v, i) => new { index = i, value = v }))
+                            var definitions = new List<Definition> { };
+                            foreach (var item in contexts)
                             {
-                                var val = item.value;
-                                var index = item.index;
-                                var partOfSpeechContextBase = val.Children.FirstOrDefault(x => x.ClassName.Equals(POS_BD_CHLD1_CHLD1));
+                                var partOfSpeechContextBase = item.Children.FirstOrDefault(x => x.ClassName.Equals(POS_BD_CHLD1_CHLD1));
                                 var partOfSpeechContext = string.Empty;
                                 foreach (var el in partOfSpeechContextBase.Children)
                                 {
                                     partOfSpeechContext += " " + el.TextContent.Replace('\n', ' ').Trim();
                                     partOfSpeechContext = partOfSpeechContext.TrimStart();
-
                                 }
-                                var definitionsInfo = val?.Children?
+
+                                var definitionsInfo = item?.Children?
                                         .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1))?.Children?
                                         .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1))?.Children;
 
-                                var definitionText = definitionsInfo.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD1))?.Children?
+                                var definitionText = definitionsInfo?.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD1))?.Children?
                                                         .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD1_CHLD2))?.TextContent;
 
-                                var definitionBody = definitionsInfo.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2));
+                                var levelInfo = definitionsInfo?.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD1))?.Children?
+                                                            .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD1_CHLD1))?.TextContent ?? "";
+                                var level = levelInfo.Split(' ')[0];
+
+                                var definitionBody = definitionsInfo?.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2));
 
                                 var definitionExamples = definitionBody?.Children.Where(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD1))?.Select(x =>
                                     new TextBody
                                     {
-                                        Word = x?.Children.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD1_CHLD1))?.TextContent ?? string.Empty,
-                                        Sentence = x?.Children.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD1_CHLD2))?.TextContent ?? string.Empty
+                                        Sentence = x?.Children.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD1_CHLD1))?.TextContent ?? string.Empty,
+                                        Word = x?.Children.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD1_CHLD2))?.TextContent ?? string.Empty
                                     }
                                 ).ToList();
 
@@ -126,47 +130,52 @@ namespace ContextProviderApp.Services
                                                                 .ToList();
 
 
-                                var isPhrasesExists = val?.Children?
+                                var isPhrasesExists = item?.Children?
                                         .Any(x => x != null && !string.IsNullOrEmpty(x.ClassName)
                                                 && x.ClassName.Contains(POS_BD_CHLD2_CHLD1)
                                                 && x.Children.Any(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1)));
 
-                                var phrases = isPhrasesExists.HasValue && isPhrasesExists.Value ? val?.Children?
+                                var phrases = isPhrasesExists.HasValue && isPhrasesExists.Value ? item?.Children?
                                         .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1))?.Children?
-                                        .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD2))?.Children
+                                        .Where(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD2))?
                                         .Select(x => new Phrase
                                         {
-                                            Title = x.Children?.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD2_CHLD1))?.TextContent ?? "",
+                                            Title = (x.Children?.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD2_CHLD1))?
+                                                     .Children?.FirstOrDefault(x => x.ClassName.Contains("title"))?.TextContent) ?? "",
+
                                             Text = x.Children?.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD2_CHLD2))?.Children
                                                             .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1))?.Children?
                                                             .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD1))?.TextContent ?? "",
-                                            Example = x.Children?.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2))?.Children?
-                                                        .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD1))?.TextContent ?? ""
 
-                                        }) : new List<Phrase>();
+                                            Example = x.Children?.FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD2_CHLD2))?.Children
+                                                                .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1))?.Children?
+                                                                .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2))?.Children?
+                                                                .FirstOrDefault(x => x.ClassName.Contains(POS_BD_CHLD2_CHLD1_CHLD1_CHLD2_CHLD1))?.TextContent ?? ""
+
+                                        }).ToList()
+                                        : new List<Phrase>();
 
                                 var definitionData = new Definition
                                 {
+                                    PartOfSpeechContext = partOfSpeechContext,
+                                    Level = level,
                                     Text = definitionText,
                                     Examples = definitionExamples,
                                     Synonyms = synonyms,
-
+                                    Phrases = phrases
                                 };
-                                meaning.PartOfSpeechContext = partOfSpeechContext;
-                                meaning.Definitions.Add(definitionData);
 
-                                meanings.Add(meaning);
+                                definitions.Add(definitionData);
                             }
-                        }
+                            meaning.Definitions.AddRange(definitions);
 
-                        var contextData = new ContextData
-                        {
-                            PartOfSpeech = partOfSpeech,
-                            ContextBody = meanings
-                        };
+                        }
+                        // meanings.Add(meaning);
+                        contextData.PartOfSpeech = partOfSpeech;
+                        contextData.ContextBody.Add(meaning);
                         result.Contexts.Add(contextData);
-                        result.SourceWord = text;
                     }
+                    result.SourceWord = text;
                 }
 
                 return result;
@@ -182,13 +191,12 @@ namespace ContextProviderApp.Services
     public class Result
     {
         public string SourceWord { get; set; }
-
-        public List<ContextData> Contexts { get; set; }
+        public List<ContextData> Contexts { get; set; } = new List<ContextData> { };
     }
 
     public class ContextData
     {
         public string PartOfSpeech { get; set; }
-        public List<Meaning> ContextBody { get; set; }
+        public List<Meaning> ContextBody { get; set; } = new List<Meaning> { };
     }
 }
