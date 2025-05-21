@@ -5,6 +5,12 @@ namespace ContextProviderApp.Models;
 
 public class Definition
 {
+    public List<DefinitionBody> DefinitionBodies { get; set; } = new List<DefinitionBody>();
+
+}
+
+public class DefinitionBody
+{
     public string PartOfSpeechContext { get; set; }
     public string Level { get; set; }
     public string Text { get; set; }
