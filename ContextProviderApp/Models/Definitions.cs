@@ -1,17 +1,15 @@
-using System.Globalization;
-using Microsoft.AspNetCore.SignalR;
-
 namespace ContextProviderApp.Models;
 
 public class Definition
 {
-    public List<DefinitionBody> DefinitionBodies { get; set; } = new List<DefinitionBody>();
+    public string PartOfSpeechContext { get; set; }
+    public List<DefinitionBody> Data { get; set; } = new List<DefinitionBody>();
 
 }
 
 public class DefinitionBody
 {
-    public string PartOfSpeechContext { get; set; }
+
     public string Level { get; set; }
     public string Text { get; set; }
     public List<TextBody> Examples { get; set; }
