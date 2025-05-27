@@ -8,11 +8,8 @@ namespace ContextProviderApp.Services
 
     public class DictionaryService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-
         public DictionaryService(IHttpClientFactory httpClientFactory)
         {
-            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<Result?> GetDictionaryAsync(string text)
@@ -49,7 +46,6 @@ namespace ContextProviderApp.Services
 
                 var POS_BD_CHLD2_CHLD1 = "sense-body dsense_b";
                 var POS_BD_CHLD2_CHLD1_CHLD1 = "def-block ddef_block";
-
 
                 var POS_BD_CHLD2_CHLD1_CHID1_CHLD0 = "hflxrev hdf-xs hdb-s hdf-l";
                 var POS_BD_CHLD2_CHLD1_CHID1_CHLD0_CHLD1 = "hflx1";
@@ -173,7 +169,7 @@ namespace ContextProviderApp.Services
                                             }).ToList()
                                             : new List<Phrase>();
 
-                                    var definitionBodyData = new DefinitionBody
+                                    var definitionBodyData = new DefinitionData
                                     {
                                         Level = level,
                                         Text = definitionText,
@@ -189,7 +185,6 @@ namespace ContextProviderApp.Services
                             meaning.Definitions.AddRange(definitions);
 
                         }
-                        // meanings.Add(meaning);
                         contextData.PartOfSpeech = partOfSpeech;
                         contextData.ContextBody.Add(meaning);
                         result.Contexts.Add(contextData);
@@ -205,17 +200,5 @@ namespace ContextProviderApp.Services
                 throw new Exception("couldnt fetch data");
             }
         }
-    }
-
-    public class Result
-    {
-        public string SourceWord { get; set; }
-        public List<ContextData> Contexts { get; set; } = new List<ContextData> { };
-    }
-
-    public class ContextData
-    {
-        public string PartOfSpeech { get; set; }
-        public List<Meaning> ContextBody { get; set; } = new List<Meaning> { };
     }
 }
