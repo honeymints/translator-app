@@ -1,4 +1,4 @@
-namespace ContextProviderApp.Models;
+namespace ContextProviderApp.Api.Models;
 
 public class Definition
 {

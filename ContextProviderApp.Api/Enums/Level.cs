@@ -1,4 +1,4 @@
-namespace ContextProviderApp.Enums;
+namespace ContextProviderApp.Api.Enums;
 
 public enum Level
 {

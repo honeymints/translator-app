@@ -1,15 +1,17 @@
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using ContextProviderApp.Models;
+using ContextProviderApp.Api.Models;
 
-namespace ContextProviderApp.Services
+namespace ContextProviderApp.Api.Services
 {
 
     public class DictionaryService
     {
-        public DictionaryService(IHttpClientFactory httpClientFactory)
+        private readonly ITelegramBot _telegramBot;
+        public DictionaryService(ITelegramBot telegramBot)
         {
+            _telegramBot = telegramBot;
         }
 
         public async Task<Result?> GetDictionaryAsync(string text)
@@ -191,7 +193,7 @@ namespace ContextProviderApp.Services
                     }
                     result.SourceWord = text;
                 }
-                
+
                 return result;
             }
             catch (Exception e)
