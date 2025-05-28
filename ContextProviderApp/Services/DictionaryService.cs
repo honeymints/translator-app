@@ -191,7 +191,7 @@ namespace ContextProviderApp.Services
                     }
                     result.SourceWord = text;
                 }
-
+                
                 return result;
             }
             catch (Exception e)
