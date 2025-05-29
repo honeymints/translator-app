@@ -1,4 +1,4 @@
-namespace ContextProviderApp.Api.Enums;
+namespace ContextProviderApp.Enums;
 
 public enum PartOfSpeech
 {

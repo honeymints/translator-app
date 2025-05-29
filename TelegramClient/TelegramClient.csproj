@@ -8,7 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Telegram.Bot" Version="22.5.1" />
+    <PackageReference Include="Telnet" Version="0.13.1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ContextProviderApp\ContextProviderApp.csproj" />
+
+  </ItemGroup>
+
 
 </Project>

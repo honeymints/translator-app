@@ -1,17 +1,20 @@
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using ContextProviderApp.Api.Models;
+using ContextProviderApp.Interfaces;
+using ContextProviderApp.Models;
 
-namespace ContextProviderApp.Api.Services
+namespace ContextProviderApp.Services
 {
 
     public class DictionaryService
     {
-        private readonly ITelegramBot _telegramBot;
-        public DictionaryService(ITelegramBot telegramBot)
+        private readonly ITelegramClient _telegramClient;
+        private readonly TelegramClientService _telegramClientService;
+        public DictionaryService(ITelegramClient telegramClient)
         {
-            _telegramBot = telegramBot;
+            _telegramClient = telegramClient ?? throw new ArgumentNullException(nameof(telegramClient));
+            _telegramClientService = new TelegramClientService(_telegramClient);
         }
 
         public async Task<Result?> GetDictionaryAsync(string text)
